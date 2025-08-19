@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MauiBankingExercise.Services;
+using MauiBankingExercise.ViewModels;
+using MauiBankingExercise.Views;
+using Microsoft.Extensions.Logging;
 
 namespace MauiBankingExercise
 {
@@ -18,6 +21,17 @@ namespace MauiBankingExercise
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+           
+            //Customers
+            builder.Services.AddSingleton<CustomerListViewModel>();
+            builder.Services.AddTransient<CustomersListView>();
+            //Customer
+            builder.Services.AddSingleton<CustomerViewModel>();
+            builder.Services.AddTransient<CustomerView>();
+
+            //Database Service
+            builder.Services.AddSingleton<BankingDatabaseService>();
+
 
             return builder.Build();
         }
