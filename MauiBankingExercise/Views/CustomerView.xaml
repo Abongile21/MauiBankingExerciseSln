@@ -4,27 +4,80 @@
              x:Class="MauiBankingExercise.Views.CustomerView"
              xmlns:vm="clr-namespace:MauiBankingExercise.ViewModels"
              xmlns:models="clr-namespace:MauiBankingExercise.Models"
-             Title="CustomerView"
+             Title="Customer Details"
              x:DataType="vm:CustomerViewModel">
-    <StackLayout Padding="20">
-        <Label Text="{Binding Customer.FirstName}" FontSize="24"/>
 
-        <CollectionView ItemsSource="{Binding Accounts}" SelectionMode="Single" SelectedItem="{Binding SelectedAccount}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Customer">
-                    <Border Padding="10" Margin="5">
-                        <StackLayout>
-                            <Label Text="{Binding AccountNumber}"/>
-                            <Label Text="{Binding AccountBalance, StringFormat='Balance: {0:C}'}"/>
-                        </StackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
 
-        <Label Text="Transaction"/>
-        <Picker Title="Select Type" ItemsSource="{Binding TransactionTypes}" SelectedItem="{Binding SelectedTransactionType}"/>
-        <Entry Placeholder="Amount" Keyboard="Numeric" Text="{Binding TransactionAmount}"/>
-        <Button Text="Submit Transaction" Command="{Binding SubmitTransactionCommand}"/>
-    </StackLayout>
+           
+            <Frame Padding="15" BorderColor="Gray" CornerRadius="12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Customer Information" FontSize="20" FontAttributes="Bold"/>
+                    <Label Text="{Binding Customer.FirstName}" FontSize="18"/>
+                    <Label Text="{Binding Customer.LastName}" FontSize="18"/>
+                    <Label Text="{Binding Customer.Email}" FontSize="14" TextColor="Gray"/>
+                    <Label Text="{Binding Customer.Phone}" FontSize="14" TextColor="Gray"/>
+                    <Label Text="{Binding Customer.Address}" FontSize="14" TextColor="Gray"/>
+                    <Label Text="{Binding TotalBalance, StringFormat='Total Balance: {0:C}'}" FontSize="16" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Accounts" FontSize="20" FontAttributes="Bold"/>
+            <CollectionView ItemsSource="{Binding Accounts}" 
+                            SelectionMode="Single" 
+                            SelectedItem="{Binding SelectedAccount}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Account">
+                        <Border Padding="10" Margin="5">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding AccountNumber}" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding AccountType.TypeName}" FontSize="14" TextColor="Gray"/>
+                                <Label Text="{Binding AccountBalance, StringFormat='Balance: {0:C}'}" FontSize="14"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Transact" FontSize="20" FontAttributes="Bold" Margin="0,10,0,0"/>
+            <Picker Title="Select Type" 
+                    ItemsSource="{Binding TransactionTypes}" 
+                    SelectedItem="{Binding SelectedTransactionType}"/>
+            <Entry Placeholder="Amount" Keyboard="Numeric" Text="{Binding TransactionAmount}"/>
+            <Button Text="Submit Transaction" Command="{Binding SubmitTransactionCommand}"/>
+
+           
+            <Label Text="Recent Transactions" FontSize="20" FontAttributes="Bold" Margin="0,20,0,0"/>
+            <CollectionView ItemsSource="{Binding RecentTransactions}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Transaction">
+                        <Border Padding="10" Margin="5">
+                          <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+                        
+                            <Label 
+                                Grid.Column="0"
+                                Text="{Binding TransactionDate, StringFormat='{}{0:MM/dd/yyyy}'}" />
+                        
+                            <Label 
+                                Grid.Column="1"
+                                Text="{Binding TransactionType.TypeName}" />
+                        
+                            <Label 
+                                Grid.Column="2"
+                                Text="{Binding Amount, StringFormat='{}{0:C}'}"
+                                HorizontalOptions="End" />
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
