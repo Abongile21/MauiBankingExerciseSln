@@ -4,9 +4,21 @@ namespace MauiBankingExercise.Views;
 
 public partial class CustomerView : ContentPage
 {
-	public CustomerView()
-	{
+    private readonly CustomerViewModel _viewModel;
+
+    public CustomerView()
+    {
         InitializeComponent();
-        BindingContext = new CustomerViewModel();
+        _viewModel = new CustomerViewModel();
+        BindingContext = _viewModel;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        if (_viewModel.CustomerId != 0)
+        {
+            await _viewModel.LoadCustomerData();
+        }
     }
 }
