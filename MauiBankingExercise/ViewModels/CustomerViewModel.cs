@@ -1,39 +1,41 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
 using MauiBankingExercise.Models;
 using MauiBankingExercise.Services;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 
 namespace MauiBankingExercise.ViewModels
 {
     [QueryProperty(nameof(CustomerId), "customerId")]
     public class CustomerViewModel : INotifyPropertyChanged
     {
-        private readonly BankingDatabaseService _service;
+        private readonly BankingDatabaseService _service = new();
         private Customer _customer;
         private Account _selectedAccount;
         private string _selectedTransactionType;
         private string _transactionAmount;
         private bool _isLoading;
-
-        public ObservableCollection<Account> Accounts { get; set; }
-        public ObservableCollection<string> TransactionTypes { get; set; }
-        public ICommand SubmitTransactionCommand { get; set; }
-        public ICommand RefreshCommand { get; set; }
-
         private int _customerId;
+
+        public ObservableCollection<Account> Accounts { get; } = new();
+        public ObservableCollection<Transaction> RecentTransactions { get; } = new();
+        public ObservableCollection<string> TransactionTypes { get; } = new() { "Deposit", "Withdrawal" };
+
+        public ICommand SubmitTransactionCommand { get; }
+        public ICommand RefreshCommand { get; }
+        public ICommand ViewTransactionsCommand { get; }
+
         public int CustomerId
         {
             get => _customerId;
             set
             {
-                _customerId = value;
-                OnPropertyChanged();
-                if (_customerId != 0)
+                if (_customerId != value)
                 {
+                    _customerId = value;
+                    OnPropertyChanged();
                     _ = LoadCustomerData();
                 }
             }
@@ -42,87 +44,82 @@ namespace MauiBankingExercise.ViewModels
         public Customer Customer
         {
             get => _customer;
-            set
-            {
-                _customer = value;
-                OnPropertyChanged();
-            }
+            set { _customer = value; OnPropertyChanged(); OnPropertyChanged(nameof(CustomerName)); OnPropertyChanged(nameof(TotalBalance)); }
         }
+
+        public string CustomerName => Customer == null ? "Unknown Customer" : $"{Customer.FirstName} {Customer.LastName}";
+        public decimal TotalBalance => Accounts.Sum(a => a.AccountBalance);
 
         public Account SelectedAccount
         {
             get => _selectedAccount;
-            set
-            {
-                _selectedAccount = value;
-                OnPropertyChanged();
-            }
+            set { _selectedAccount = value; OnPropertyChanged(); _ = LoadAccountTransactions(); }
         }
 
         public string SelectedTransactionType
         {
             get => _selectedTransactionType;
-            set
-            {
-                _selectedTransactionType = value;
-                OnPropertyChanged();
-            }
+            set { _selectedTransactionType = value; OnPropertyChanged(); }
         }
 
         public string TransactionAmount
         {
             get => _transactionAmount;
-            set
-            {
-                _transactionAmount = value;
-                OnPropertyChanged();
-            }
+            set { _transactionAmount = value; OnPropertyChanged(); }
         }
 
         public bool IsLoading
         {
             get => _isLoading;
-            set
-            {
-                _isLoading = value;
-                OnPropertyChanged();
-            }
+            set { _isLoading = value; OnPropertyChanged(); }
         }
 
         public CustomerViewModel()
         {
-            _service = new BankingDatabaseService();
-            Accounts = new ObservableCollection<Account>();
-            TransactionTypes = new ObservableCollection<string> { "Deposit", "Withdrawal" };
-
             SubmitTransactionCommand = new Command(async () => await SubmitTransaction(), CanSubmitTransaction);
             RefreshCommand = new Command(async () => await LoadCustomerData());
+            ViewTransactionsCommand = new Command<Account>(async acc => await ViewAccountTransactions(acc));
         }
 
-        public async Task LoadCustomerData()
+        private async Task LoadCustomerData()
         {
             if (CustomerId == 0) return;
-
             IsLoading = true;
+
             try
             {
                 Customer = _service.GetCustomer(CustomerId);
-                var accounts = _service.GetCustomerAccounts(CustomerId);
 
                 Accounts.Clear();
-                if (accounts != null)
+                foreach (var acc in _service.GetCustomerAccounts(CustomerId))
                 {
-                    foreach (var account in accounts)
-                        Accounts.Add(account);
+                    acc.AccountType ??= _service.GetAccountType(acc.AccountTypeId);
+                    Accounts.Add(acc);
                 }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", $"Failed to load customer data: {ex.Message}", "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", $"Failed to load: {ex.Message}", "OK");
             }
-            finally
+            finally { IsLoading = false; }
+        }
+
+        private async Task LoadAccountTransactions()
+        {
+            if (SelectedAccount == null) return;
+
+            try
             {
-                IsLoading = false;
+                RecentTransactions.Clear();
+                foreach (var tx in _service.GetAccountTransactions(SelectedAccount.AccountId, 10))
+                {
+                    tx.TransactionType ??= _service.GetTransactionType(tx.TransactionTypeId);
+                    RecentTransactions.Add(tx);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Transactions error: {ex.Message}");
             }
         }
 
@@ -130,58 +127,65 @@ namespace MauiBankingExercise.ViewModels
         {
             if (!CanSubmitTransaction()) return;
 
-            if (!decimal.TryParse(TransactionAmount, out decimal amount) || amount <= 0)
+            if (!decimal.TryParse(TransactionAmount, out var amount) || amount <= 0)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "Please enter a valid amount", "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", "Enter a valid amount > 0", "OK");
                 return;
             }
 
             int typeId = SelectedTransactionType == "Deposit" ? 1 : 2;
-
             IsLoading = true;
+
             try
             {
                 _service.AddTransaction(SelectedAccount.AccountId, amount, typeId);
-
                 await LoadCustomerData();
+                await LoadAccountTransactions();
 
                 TransactionAmount = "";
-                SelectedAccount = null;
                 SelectedTransactionType = null;
 
-                await Application.Current.MainPage.DisplayAlert("Success", "Transaction completed successfully", "OK");
+                await Application.Current.MainPage.DisplayAlert("Success",
+                    $"{SelectedTransactionType}: {amount:C} completed!", "OK");
             }
             catch (Exception ex)
             {
                 await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
-            finally
+            finally { IsLoading = false; }
+        }
+
+        private async Task ViewAccountTransactions(Account account)
+        {
+            if (account == null) return;
+
+            try
             {
-                IsLoading = false;
+                var txs = _service.GetAccountTransactions(account.AccountId, 10);
+                var list = string.Join("\n", txs.Select(t =>
+                    $"{t.TransactionDate:MM/dd/yyyy} - {_service.GetTransactionTypeName(t.TransactionTypeId)}: {t.Amount:C}"));
+
+                await Application.Current.MainPage.DisplayAlert("Transactions",
+                    $"Account: {account.AccountNumber}\nBalance: {account.AccountBalance:C}\n\n{list}", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
         }
 
-        private bool CanSubmitTransaction()
-        {
-            return SelectedAccount != null &&
-                   !string.IsNullOrWhiteSpace(SelectedTransactionType) &&
-                   !string.IsNullOrWhiteSpace(TransactionAmount) &&
-                   !IsLoading;
-        }
+        private bool CanSubmitTransaction() =>
+            SelectedAccount != null &&
+            !string.IsNullOrWhiteSpace(SelectedTransactionType) &&
+            !string.IsNullOrWhiteSpace(TransactionAmount) &&
+            !IsLoading;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-            if (propertyName == nameof(SelectedAccount) ||
-                propertyName == nameof(SelectedTransactionType) ||
-                propertyName == nameof(TransactionAmount) ||
-                propertyName == nameof(IsLoading))
-            {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            if (name is nameof(SelectedAccount) or nameof(SelectedTransactionType) or nameof(TransactionAmount) or nameof(IsLoading))
                 ((Command)SubmitTransactionCommand).ChangeCanExecute();
-            }
         }
     }
 }
