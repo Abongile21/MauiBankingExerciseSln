@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiBankingExercise.Views.CustomerView"
              xmlns:vm="clr-namespace:MauiBankingExercise.ViewModels"
+             xmlns:models="clr-namespace:MauiBankingExercise.Models"
              Title="CustomerView"
              x:DataType="vm:CustomerViewModel">
     <StackLayout Padding="20">
@@ -10,7 +11,7 @@
 
         <CollectionView ItemsSource="{Binding Accounts}" SelectionMode="Single" SelectedItem="{Binding SelectedAccount}">
             <CollectionView.ItemTemplate>
-                <DataTemplate >
+                <DataTemplate x:DataType="models:Customer">
                     <Border Padding="10" Margin="5">
                         <StackLayout>
                             <Label Text="{Binding AccountNumber}"/>

@@ -4,9 +4,9 @@ namespace MauiBankingExercise.Views;
 
 public partial class CustomerView : ContentPage
 {
-	public CustomerView(int customerId)
+	public CustomerView()
 	{
         InitializeComponent();
-        BindingContext = new CustomerViewModel(customerId);
+        BindingContext = new CustomerViewModel();
     }
 }
