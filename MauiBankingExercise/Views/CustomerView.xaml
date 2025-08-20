@@ -2,11 +2,28 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiBankingExercise.Views.CustomerView"
-             Title="CustomerView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             xmlns:vm="clr-namespace:MauiBankingExercise.ViewModels"
+             Title="CustomerView"
+             x:DataType="vm:CustomerViewModel">
+    <StackLayout Padding="20">
+        <Label Text="{Binding Customer.FirstName}" FontSize="24"/>
+
+        <CollectionView ItemsSource="{Binding Accounts}" SelectionMode="Single" SelectedItem="{Binding SelectedAccount}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate >
+                    <Border Padding="10" Margin="5">
+                        <StackLayout>
+                            <Label Text="{Binding AccountNumber}"/>
+                            <Label Text="{Binding AccountBalance, StringFormat='Balance: {0:C}'}"/>
+                        </StackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label Text="Transaction"/>
+        <Picker Title="Select Type" ItemsSource="{Binding TransactionTypes}" SelectedItem="{Binding SelectedTransactionType}"/>
+        <Entry Placeholder="Amount" Keyboard="Numeric" Text="{Binding TransactionAmount}"/>
+        <Button Text="Submit Transaction" Command="{Binding SubmitTransactionCommand}"/>
+    </StackLayout>
 </ContentPage>

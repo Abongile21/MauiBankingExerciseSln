@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace MauiBankingExercise.Services
 {
-    public class BankingDataService
+    public class BankingDatabaseService
     {
         private readonly SQLiteConnection _db;
         private static string DbFileName = "BankingApp.db";
 
-        public BankingDataService()
+        public BankingDatabaseService()
         {
             var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DbFileName);
 

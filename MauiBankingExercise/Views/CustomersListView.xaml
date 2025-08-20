@@ -2,11 +2,20 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiBankingExercise.Views.CustomersListView"
+             xmlns:vm="clr-namespace:MauiBankingExercise.ViewModels"
+             xmlns:models="clr-namespace:MauiBankingExercise.Models"
+             x:DataType="vm:CustomersListViewModel"
              Title="CustomersView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <StackLayout Padding="20">
+        <Label Text="Select Customer" FontSize="24"/>
+        <CollectionView ItemsSource="{Binding Customers}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Customer">
+                    <Border Padding="10" Margin="5">
+                        <Label Text="{Binding FirstName}"/>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </StackLayout>
 </ContentPage>

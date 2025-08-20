@@ -8,11 +8,11 @@ namespace MauiBankingExercise.ViewModels
 {
     public class CustomerViewModel : BindableObject
     {
-        private readonly BankingDataService _service;
+        private readonly BankingDatabaseService _service;
 
         public Customer Customer { get; set; }
         public ObservableCollection<Account> Accounts { get; set; }
-        public ObservableCollection<string> TransactionTypes { get; set; }
+        public ObservableCollection<TransactionType> TransactionTypes { get; set; }
         public Account SelectedAccount { get; set; }
         public string SelectedTransactionType { get; set; }
         public string TransactionAmount { get; set; }
@@ -21,11 +21,11 @@ namespace MauiBankingExercise.ViewModels
 
         public CustomerViewModel(int customerId)
         {
-            _service = new BankingDataService();
+            _service = new BankingDatabaseService();
             Customer = _service.GetCustomer(customerId);
             Accounts = new ObservableCollection<Account>(_service.GetCustomerAccounts(customerId));
 
-            TransactionTypes = new ObservableCollection<string> { "Deposit", "Withdrawal" };
+           
             SubmitTransactionCommand = new Command(SubmitTransaction);
         }
 
