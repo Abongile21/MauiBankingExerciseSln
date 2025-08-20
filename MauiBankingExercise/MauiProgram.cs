@@ -17,15 +17,16 @@ namespace MauiBankingExercise
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+            
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
            
             //Customers
             builder.Services.AddSingleton<CustomersListViewModel>();
             builder.Services.AddTransient<CustomersListView>();
-            //Customer
+            //SingleCustomer
             builder.Services.AddSingleton<CustomerViewModel>();
             builder.Services.AddTransient<CustomerView>();
 
