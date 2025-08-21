@@ -16,6 +16,7 @@ namespace MauiBankingExercise.ViewModels
         public ObservableCollection<Customer> Customers { get; set; }
         public ICommand SelectCustomerCommand { get; set; }
 
+
         public bool IsLoading
         {
             get => _isLoading;

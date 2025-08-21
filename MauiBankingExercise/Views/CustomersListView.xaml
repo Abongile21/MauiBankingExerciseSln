@@ -7,25 +7,41 @@
              x:DataType="vm:CustomersListViewModel"
              Title="Customers">
 
-    <StackLayout Padding="20" Spacing="10">
 
 
-        <Label Text="Select Customer" FontSize="24" HorizontalOptions="Center"/>
 
         <CollectionView ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}" SelectionMode="Single" SelectionChangedCommand="{Binding SelectCustomerCommand}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Customer">
                     <Border Padding="15" Margin="5" BackgroundColor="LightGray">
-                        <StackLayout>
-                            <Label Text="{Binding FirstName}" FontAttributes="Bold" FontSize="18"/>
-                            <Label Text="{Binding LastName}" FontSize="16"/>
-                        </StackLayout>
-                    </Border
-                            >
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="5"/>
+                        </Border.StrokeShape>
+                    <Grid Padding="10" ColumnSpacing="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label FontAttributes="Bold" FontSize="15" Grid.Row="0" Grid.Column="0">
+                            <Label.Text>
+                                <MultiBinding StringFormat="{}{0} {1}">
+                                    <Binding Path="FirstName"/>
+                                    <Binding Path="LastName"/>
+                                </MultiBinding>
+                            </Label.Text>
+                        </Label>
+
+                        <Label FontAttributes="Italic" Text="{Binding Email}" TextColor="DarkOrchid" FontSize="15" Grid.Row="1" Grid.Column="0"/>
+                    </Grid>
+
+                </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
-            
         </CollectionView>
-    </StackLayout>
+   
 </ContentPage>

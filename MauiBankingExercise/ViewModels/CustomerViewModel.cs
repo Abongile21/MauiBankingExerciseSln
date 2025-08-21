@@ -112,26 +112,26 @@ namespace MauiBankingExercise.ViewModels
         }
 
 
-        private Task LoadAccountTransactions()
+        private async Task LoadAccountTransactions()
         {
-            if (SelectedAccount == null)
-                return Task.CompletedTask;
+            if (SelectedAccount == null) return;
+
             try
             {
                 RecentTransactions.Clear();
-                foreach (var tx in _service.GetAccountTransactions(SelectedAccount.AccountId))
+                var transactions =_service.GetAccountTransactions(SelectedAccount.AccountId);
+                foreach (var tx in transactions)
                 {
-                    tx.TransactionType ??= _service.GetTransactionType(tx.TransactionTypeId);
+                    tx.TransactionType ??=  _service.GetTransactionType(tx.TransactionTypeId);
                     RecentTransactions.Add(tx);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Transactions error: {ex.Message}");
+                await Shell.Current.DisplayAlert("Error", $"Failed to load: {ex.Message}", "OK");
             }
-
-            return Task.CompletedTask;
         }
+
         private async Task SubmitTransaction()
         {
             if (!CanSubmitTransaction()) return;
@@ -142,7 +142,8 @@ namespace MauiBankingExercise.ViewModels
                 return;
             }
 
-            int typeId = SelectedTransactionType == "Deposit" ? 1 : 2;
+            string typeLabel = SelectedTransactionType;
+            int typeId = typeLabel == "Deposit" ? 1 : 2;
             IsLoading = true;
 
             try
@@ -155,7 +156,7 @@ namespace MauiBankingExercise.ViewModels
                 SelectedTransactionType = null;
 
                 await Shell.Current.DisplayAlert("Success",
-                    $"{SelectedTransactionType}: {amount:C} completed!", "OK");
+                    $"{typeLabel}: {amount:C} completed!", "OK");
             }
             catch (Exception ex)
             {
@@ -188,6 +189,7 @@ namespace MauiBankingExercise.ViewModels
             !string.IsNullOrWhiteSpace(SelectedTransactionType) &&
             !string.IsNullOrWhiteSpace(TransactionAmount) &&
             !IsLoading;
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = null)

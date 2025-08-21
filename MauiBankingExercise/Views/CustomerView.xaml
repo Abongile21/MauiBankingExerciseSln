@@ -11,26 +11,38 @@
         <VerticalStackLayout Padding="20" Spacing="15">
 
            
-            <Border Padding="15">
+            <Border Padding="15" Background="DarkKhaki">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Customer Information" FontSize="20" FontAttributes="Bold"/>
-                    <Label Text="{Binding Customer.FirstName}" FontSize="18"/>
-                    <Label Text="{Binding Customer.LastName}" FontSize="18"/>
-                    <Label Text="{Binding Customer.Email}" FontSize="14" TextColor="Gray"/>
-                    <Label Text="{Binding Customer.Bank.BankId}" FontSize="14" TextColor="Gray"/>
+                    <Label Text="Customer Information" FontSize="15" FontAttributes="Bold"/>
+                    <Label Text="{Binding Customer.FirstName, StringFormat='Name: {0}'}" FontSize="15"/>
+                    <Label Text="{Binding Customer.LastName, StringFormat='Surname: {0}'}" FontSize="15"/>
+
+
+                    <Label Text="{Binding Customer.Email, StringFormat='Email: {0}'}" FontSize="14" TextColor="Red"/>
+
+                    <Label Text="{Binding Customer.PhysicalAddress, StringFormat='Address: {0}'}" FontSize="18"/>
+                    <Label Text="{Binding Customer.BankId, StringFormat='Bank: {0}'}" FontSize="14" TextColor="Gray"/>
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="Accounts" FontSize="20" FontAttributes="Bold"/>
+            <Label Text="Accounts" FontSize="18" FontAttributes="Bold"/>
             <CollectionView ItemsSource="{Binding Accounts}" 
                             SelectionMode="Single" 
                             SelectedItem="{Binding SelectedAccount}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Account">
-                        <Border Padding="10" Margin="5">
+                        <Border Padding="10" Background="DarkKhaki">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+
                             <VerticalStackLayout>
-                                <Label Text="{Binding AccountNumber}" FontSize="16" FontAttributes="Bold"/>
-                                <Label Text="{Binding AccountType.Name}" FontSize="14" TextColor="Gray"/>
+                                <Label Text="{Binding AccountNumber, StringFormat='Account no:  {0}'}" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding AccountType.Name, StringFormat='Account:  {0}'}" FontSize="14" TextColor="Red"/>
                                 <Label Text="{Binding AccountBalance, StringFormat='Balance: {0:C}'}" FontSize="14"/>
                             </VerticalStackLayout>
                         </Border>
@@ -38,12 +50,13 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Label Text="Transact" FontSize="20" FontAttributes="Bold" Margin="0,10,0,0"/>
+            <Label Text="Transact" FontSize="18" FontAttributes="Bold" Margin="0,10,0,0"/>
             <Picker Title="Select Type" 
                     ItemsSource="{Binding TransactionTypes}" 
                     SelectedItem="{Binding SelectedTransactionType}"/>
             <Entry Placeholder="Amount" Keyboard="Numeric" Text="{Binding TransactionAmount}"/>
-            <Button Text="Submit Transaction" Command="{Binding SubmitTransactionCommand}"/>
+            <Button Text="Submit Transaction" Command="{Binding SubmitTransactionCommand}" 
+                    Background="DarkKhaki" FontAttributes="Bold"/>
 
            
             <Label Text="Recent Transactions" FontSize="20" FontAttributes="Bold" Margin="0,20,0,0"/>
@@ -51,7 +64,8 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Transaction">
                         <Border Padding="10" Margin="5">
-                          <Grid>
+                           
+                            <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="2*" />
