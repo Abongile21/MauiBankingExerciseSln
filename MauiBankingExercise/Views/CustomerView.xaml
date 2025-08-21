@@ -18,11 +18,10 @@
 
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Customer Information" FontSize="15" FontAttributes="Bold"/>
-                    <Label Text="{Binding Customer.FirstName, StringFormat='Name: {0}'}" FontSize="15"/>
-                    <Label Text="{Binding Customer.LastName, StringFormat='Surname: {0}'}" FontSize="15"/>
+                    <Label Text="{Binding CustomerName, StringFormat='Name: {0}'}" FontSize="15"/>
 
 
-                    <Label Text="{Binding Customer.Email, StringFormat='Email: {0}'}" FontSize="14" TextColor="Red"/>
+                    <Label Text="{Binding Customer.Email, StringFormat='Email: {0}'}" FontSize="14" TextColor="White"/>
 
                     <Label Text="{Binding Customer.PhysicalAddress, StringFormat='Address: {0}'}" FontSize="18"/>
                     <Label Text="{Binding Customer.BankId, StringFormat='Bank: {0}'}" FontSize="14" TextColor="Gray"/>

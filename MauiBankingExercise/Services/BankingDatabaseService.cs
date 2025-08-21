@@ -35,6 +35,7 @@ namespace MauiBankingExercise.Services
             var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             return Path.Combine(basePath, DbFileName);
         }
+
         public List<Customer> GetAllCustomers() => _dbConnection.Table<Customer>().ToList();
         public Customer GetCustomer(int customerId) => _dbConnection.Table<Customer>().FirstOrDefault(c => c.CustomerId == customerId);
 
@@ -66,9 +67,12 @@ namespace MauiBankingExercise.Services
             if (account == null) throw new Exception("Account not found");
             if (transactionTypeId == 2 && account.AccountBalance < amount)
                 throw new Exception("Insufficient balance");
+
             if (transactionTypeId == 1) account.AccountBalance += amount;
             if (transactionTypeId == 2) account.AccountBalance -= amount;
+
             _dbConnection.Update(account);
+
             var transaction = new Transaction
             {
                 AccountId = accountId,
@@ -76,9 +80,8 @@ namespace MauiBankingExercise.Services
                 TransactionTypeId = transactionTypeId,
                 TransactionDate = DateTime.Now
             };
+
             _dbConnection.Insert(transaction);
         }
-
-       
     }
 }
