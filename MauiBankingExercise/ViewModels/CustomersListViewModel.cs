@@ -50,7 +50,7 @@ namespace MauiBankingExercise.ViewModels
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", $"Failed to load customers: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Failed to load customers: {ex.Message}", "OK");
             }
             finally
             {
@@ -73,22 +73,22 @@ namespace MauiBankingExercise.ViewModels
 
 
 
-
+        
         private async void OnCustomerSelected(object obj)
         {
             if (SelectedCustomer != null)
             {
                 var param = new ShellNavigationQueryParameters()
             {
-                { "SelectedCustomer", SelectedCustomer }
+                { "customerId", SelectedCustomer.CustomerId }
             };
 
-                await AppShell.Current.GoToAsync("customerview", param);
+                await AppShell.Current.GoToAsync($"customerview", param);
             }
 
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

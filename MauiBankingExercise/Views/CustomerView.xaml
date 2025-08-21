@@ -11,17 +11,15 @@
         <VerticalStackLayout Padding="20" Spacing="15">
 
            
-            <Frame Padding="15" BorderColor="Gray" CornerRadius="12">
+            <Border Padding="15">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Customer Information" FontSize="20" FontAttributes="Bold"/>
                     <Label Text="{Binding Customer.FirstName}" FontSize="18"/>
                     <Label Text="{Binding Customer.LastName}" FontSize="18"/>
                     <Label Text="{Binding Customer.Email}" FontSize="14" TextColor="Gray"/>
-                    <Label Text="{Binding Customer.Phone}" FontSize="14" TextColor="Gray"/>
-                    <Label Text="{Binding Customer.Address}" FontSize="14" TextColor="Gray"/>
-                    <Label Text="{Binding TotalBalance, StringFormat='Total Balance: {0:C}'}" FontSize="16" FontAttributes="Bold"/>
+                    <Label Text="{Binding Customer.Bank.BankId}" FontSize="14" TextColor="Gray"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <Label Text="Accounts" FontSize="20" FontAttributes="Bold"/>
             <CollectionView ItemsSource="{Binding Accounts}" 
@@ -32,7 +30,7 @@
                         <Border Padding="10" Margin="5">
                             <VerticalStackLayout>
                                 <Label Text="{Binding AccountNumber}" FontSize="16" FontAttributes="Bold"/>
-                                <Label Text="{Binding AccountType.TypeName}" FontSize="14" TextColor="Gray"/>
+                                <Label Text="{Binding AccountType.Name}" FontSize="14" TextColor="Gray"/>
                                 <Label Text="{Binding AccountBalance, StringFormat='Balance: {0:C}'}" FontSize="14"/>
                             </VerticalStackLayout>
                         </Border>
@@ -66,7 +64,7 @@
                         
                             <Label 
                                 Grid.Column="1"
-                                Text="{Binding TransactionType.TypeName}" />
+                                Text="{Binding TransactionType.Name}" />
                         
                             <Label 
                                 Grid.Column="2"

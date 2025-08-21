@@ -13,12 +13,8 @@ public partial class CustomerView : ContentPage
         BindingContext = _viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        if (_viewModel.CustomerId != 0)
-        {
-            await _viewModel.LoadCustomerData();
-        }
     }
 }

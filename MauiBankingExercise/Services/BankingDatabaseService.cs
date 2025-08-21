@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace MauiBankingExercise.Services
 {
@@ -31,72 +30,55 @@ namespace MauiBankingExercise.Services
             }
         }
 
-
-
         private string GetDatabasePath()
         {
-            string pathToDb = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            return Path.Combine(pathToDb, DbFileName);
+            var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(basePath, DbFileName);
         }
-
-        private bool ExtractDbEmbeddedResource(string dbPath)
-        {
-            var assembly = typeof(BankingDatabaseService).GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("MauiBankingExercise.EmbeddedDb.BankingApp.db");
-
-            if (stream != null && !File.Exists(dbPath))
-            {
-                using (BinaryReader br = new BinaryReader(stream))
-                using (FileStream fs = new FileStream(dbPath, FileMode.Create))
-                using (BinaryWriter bw = new BinaryWriter(fs))
-                {
-                    byte[] bytes = new byte[stream.Length];
-                    stream.Read(bytes, 0, bytes.Length);
-                    bw.Write(bytes);
-                }
-                return true;
-            }
-            return false;
-        }
-
         public List<Customer> GetAllCustomers() => _dbConnection.Table<Customer>().ToList();
-
-        public Customer GetCustomer(int customerId) => _dbConnection.Find<Customer>(customerId);
+        public Customer GetCustomer(int customerId) => _dbConnection.Table<Customer>().FirstOrDefault(c => c.CustomerId == customerId);
 
         public List<Account> GetCustomerAccounts(int customerId) =>
             _dbConnection.Table<Account>().Where(a => a.CustomerId == customerId).ToList();
 
         public List<Transaction> GetAccountTransactions(int accountId) =>
+            GetAccountTransactions(accountId, 10);
+
+        public List<Transaction> GetAccountTransactions(int accountId, int limit) =>
             _dbConnection.Table<Transaction>()
-                        .Where(t => t.AccountId == accountId)
-                        .OrderByDescending(t => t.TransactionDate)
-                        .ToList();
+                .Where(t => t.AccountId == accountId)
+                .OrderByDescending(t => t.TransactionDate)
+                .Take(limit)
+                .ToList();
+
+        public AccountType GetAccountType(int accountTypeId) =>
+            _dbConnection.Table<AccountType>().FirstOrDefault(t => t.AccountTypeId == accountTypeId);
+
+        public TransactionType GetTransactionType(int transactionTypeId) =>
+            _dbConnection.Table<TransactionType>().FirstOrDefault(t => t.TransactionTypeId == transactionTypeId);
+
+        public string GetTransactionTypeName(int transactionTypeId) =>
+            GetTransactionType(transactionTypeId)?.Name ?? "Unknown";
 
         public void AddTransaction(int accountId, decimal amount, int transactionTypeId)
         {
-            var account = _dbConnection.Find<Account>(accountId);
+            var account = _dbConnection.Table<Account>().FirstOrDefault(a => a.AccountId == accountId);
             if (account == null) throw new Exception("Account not found");
-
-            if (transactionTypeId == 2 && amount > account.AccountBalance)
-                throw new Exception("Insufficient balance for withdrawal");
-
-            if (transactionTypeId == 1)
-                account.AccountBalance += amount;
-            else
-                account.AccountBalance -= amount;
-
+            if (transactionTypeId == 2 && account.AccountBalance < amount)
+                throw new Exception("Insufficient balance");
+            if (transactionTypeId == 1) account.AccountBalance += amount;
+            if (transactionTypeId == 2) account.AccountBalance -= amount;
             _dbConnection.Update(account);
-
             var transaction = new Transaction
             {
                 AccountId = accountId,
                 Amount = amount,
                 TransactionTypeId = transactionTypeId,
-                TransactionDate = DateTime.Now,
-                Description = transactionTypeId == 1 ? "Deposit" : "Withdrawal"
+                TransactionDate = DateTime.Now
             };
-
             _dbConnection.Insert(transaction);
         }
+
+       
     }
 }
