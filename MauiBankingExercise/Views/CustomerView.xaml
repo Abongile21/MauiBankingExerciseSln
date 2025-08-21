@@ -4,7 +4,7 @@
              x:Class="MauiBankingExercise.Views.CustomerView"
              xmlns:vm="clr-namespace:MauiBankingExercise.ViewModels"
              xmlns:models="clr-namespace:MauiBankingExercise.Models"
-             Title="Customer Details"
+             Title="Customer Dashboard"
              x:DataType="vm:CustomerViewModel">
 
     <ScrollView>
@@ -30,7 +30,7 @@
 
             <Label Text="Accounts" FontSize="18" FontAttributes="Bold"/>
             <CollectionView ItemsSource="{Binding Accounts}" 
-                            SelectionMode="Single" 
+                            
                             SelectedItem="{Binding SelectedAccount}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Account">
@@ -41,7 +41,7 @@
 
                             <VerticalStackLayout>
                                 <Label Text="{Binding AccountNumber, StringFormat='Account no:  {0}'}" FontSize="16" FontAttributes="Bold"/>
-                                <Label Text="{Binding AccountType.Name, StringFormat='Account:  {0}'}" FontSize="14" TextColor="Red"/>
+                                <Label Text="{Binding AccountType.Name}" FontSize="14" TextColor="Red"/>
                                 <Label Text="{Binding AccountBalance, StringFormat='Balance: {0:C}'}" FontSize="14"/>
                             </VerticalStackLayout>
                         </Border>
@@ -62,8 +62,11 @@
             <CollectionView ItemsSource="{Binding RecentTransactions}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Transaction">
-                        <Border Padding="10" Margin="5">
-                           
+                        <Border Padding="5" Margin="5">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+
                             <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
@@ -82,7 +85,7 @@
                             <Label 
                                 Grid.Column="2"
                                 Text="{Binding Amount, StringFormat='{}{0:C}'}"
-                                HorizontalOptions="End" />
+                                HorizontalOptions="End" FontSize="10" />
                         </Grid>
                       </Border>
                     </DataTemplate>
